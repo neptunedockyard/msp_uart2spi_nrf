@@ -48,6 +48,8 @@ void UART_putc(unsigned char c){
 }
 
 void UART_puts(const char *str){
+	//to use:
+	//uart_puts((char *)")\n\r");
 	while(*str) UART_putc(*str++);
 }
 
@@ -67,4 +69,26 @@ void UART_printStatus(){
 	UART_sendTxt("UART init ........ OK\r\n", 23);
 	UART_sendTxt("I2C init ......... OK\r\n", 23);
 	UART_sendTxt("Btn init ......... OK\r\n", 23);
+}
+
+void printreg(char *name, int n){
+	int size = 8;
+    int i;
+
+	UART_puts((char *)"- ");
+	UART_puts(name);
+	UART_puts((char *)": ");
+
+    int mask = 1 << (size - 1);
+
+    for(i = 0; i < size; i++) {
+         if((n & (mask >> i)) != 0) {
+        	 UART_putc('1');
+         } else {
+        	 UART_putc('0');
+         }
+    }
+    UART_puts((char *)" (");
+    UART_putc(n);
+	UART_puts((char *)")\n\r");
 }

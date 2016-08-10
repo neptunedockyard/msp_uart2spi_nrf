@@ -7,6 +7,7 @@
 #include "si2c.h"
 #include "button.h"
 #include "slcd.h"
+#include "nrf.h"
 
 static char data;
 unsigned int i = 0;
@@ -23,7 +24,8 @@ int main() {
 //    Init_Button();
     Init_Clock(1);
     Init_UART();
-    Init_i2c();
+    Init_SPI();
+//    Init_i2c();
 
     for(i = 0; i < 30; i++)
     	UART_sendTxt("\r\n", 2);
@@ -125,6 +127,25 @@ __interrupt void USCI0RX_ISR(void)
 					command(LCD_DISPLAYCONTROL | LCD_BLINKON);
 //					write();
 				} break;
+		case '4': {
+					P1OUT ^= BIT0;
+					unsigned char stat;
+					unsigned char conf;
+					spi_CSL();
+					//send command
+//					stat = spi_xfer_byte(NRF_CMD_RREG|NRF_REG_CONFIG);
+					stat = spi_xfer_byte(_NRF24_RF_CH&0x1F);
+					//read response
+					conf = spi_xfer_byte(NRF_CMD_NOP);
+					spi_CSH();
+					UART_sendTxt("NRF registers\r\n", 15);
+					printreg((char *)"status", stat);
+					printreg((char *)"config", conf);
+				} break;
+		case '5': {
+					P1OUT ^= BIT0;
+					powerUp();
+				} break;
 		case '0': {
 			//software reset
 			WDTCTL = WDTPW | WDTHOLD;
@@ -144,7 +165,7 @@ __interrupt void USCIAB0RX_ISR(void)
 {
 	P1OUT ^= BIT0;
 	PRxData = UCB0RXBUF;						// Get RX data
-//	UART_sendTxt(PRxData, sizeof(PRxData));
+	UART_puts((char *)PRxData);
 	__bic_SR_register_on_exit(GIE);			// Exit LPM0
 }
 

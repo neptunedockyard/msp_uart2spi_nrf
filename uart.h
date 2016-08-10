@@ -20,5 +20,6 @@ void UART_printLogo();
 void UART_printStatus();
 void UART_puts(const char *str);
 void UART_putc(unsigned char c);
+void printreg(char *name, int n);
 
 #endif /* UART_H_ */

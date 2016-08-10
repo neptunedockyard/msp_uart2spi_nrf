@@ -10,7 +10,7 @@
 void Init_Button(){
 	P1SEL |= ~BIT3;				// Make sure P1.1 and P1.4 are set as a Digital I/O
 	P1SEL2 |= ~BIT3;			// Make sure P1.1 and P1.4 are set as a Digital I/O
-	P1OUT = BIT3;
+	P1OUT |= BIT3;
 	P1REN |= BIT3;
 
 	P1IE |= BIT3;				// P1.3 interrupt enabled
