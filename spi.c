@@ -7,7 +7,7 @@
 
 #include "spi.h"
 
-void Init_SPI(){
+void Init_SPI(void){
 	P1SEL |= BIT5 | BIT6 | BIT7;
 	P1SEL2 |= BIT5 | BIT6 | BIT7;
 
@@ -33,4 +33,18 @@ char SPI_txrxChar(char msg){
 	P1OUT |= (BIT5); // Unselect Device
 
 	return msg;
+}
+
+void spi_CSH(void){
+	P1OUT |= BIT3;
+}
+
+void spi_CSL(void){
+	P1OUT &= ~BIT3;
+}
+
+unsigned char spi_xfer_byte(unsigned char data){
+	UCA0TXBUF = data;
+	while(!(IFG2&UCA0TXIFG));
+	return UCA0RXBUF;
 }

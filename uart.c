@@ -42,6 +42,15 @@ void UART_sendTxt(char *TxArray,  char ArrayLength){
 	}
 }
 
+void UART_putc(unsigned char c){
+	while(!(IFG2&UCA0TXIFG));
+	UCA0TXBUF = c;
+}
+
+void UART_puts(const char *str){
+	while(*str) UART_putc(*str++);
+}
+
 void UART_printLogo(){
     UART_sendTxt(Logo1, sizeof(Logo1));
     UART_sendTxt("\r\n", 2);

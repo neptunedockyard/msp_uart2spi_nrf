@@ -45,3 +45,8 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.o
+Debug/objects.mk
+*.mk
+Debug/msp_uart2spi_nrf.elf
+Debug/makefile

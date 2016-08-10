@@ -18,5 +18,7 @@ void UART_sendChar(char msg);
 void UART_sendTxt(char *TxArray,  char ArrayLength);
 void UART_printLogo();
 void UART_printStatus();
+void UART_puts(const char *str);
+void UART_putc(unsigned char c);
 
 #endif /* UART_H_ */
