@@ -133,8 +133,7 @@ __interrupt void USCI0RX_ISR(void)
 					unsigned char conf;
 					spi_CSL();
 					//send command
-//					stat = spi_xfer_byte(NRF_CMD_RREG|NRF_REG_CONFIG);
-					stat = spi_xfer_byte(_NRF24_RF_CH&0x1F);
+					stat = spi_xfer_byte(NRF_CMD_RREG|NRF_REG_CONFIG);
 					//read response
 					conf = spi_xfer_byte(NRF_CMD_NOP);
 					spi_CSH();
@@ -145,7 +144,13 @@ __interrupt void USCI0RX_ISR(void)
 		case '5': {
 					P1OUT ^= BIT0;
 					powerUp();
+					Delay_ms(130);
+					unsigned char conf = getRegister(_NRF24_RF_SETUP);
+					printreg((char *)"conf", conf);
 				} break;
+		case '6': {
+			spi_CSL();
+		} break;
 		case '0': {
 			//software reset
 			WDTCTL = WDTPW | WDTHOLD;
