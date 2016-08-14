@@ -22,7 +22,7 @@ void UART_puts(const char *str);
 void UART_putsn(const char *str);
 void UART_putc(unsigned char c);
 void printreg(char *name, int n);
-char* itoa2(int i, char b[]);
+void ftoa(char *head, char *tail, float flt);
 static char *i2a(unsigned i, char *a, unsigned r);
 char *itoa(int i, char *a, int r);
 void UART_putcolor(char color);

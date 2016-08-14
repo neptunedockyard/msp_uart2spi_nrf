@@ -8,7 +8,7 @@
 #include "sonar.h"
 
 static int milliseconds = 0;
-static int distance = 0;
+static float distance = 0;
 static long sensor = 0;
 
 int Init_sonar(void){
@@ -51,23 +51,27 @@ void trig(void){
 }
 
 void calc(long input){
-	distance = input/58;
+	distance = (float)input/58;
 	if((distance < 2 && distance != 0) || (distance > 400)){
 		UART_putcolor('r');
 		UART_putsn((char *)"Out of range!\r");
 		UART_putcolor('w');
 	}else{
 		UART_putsn((char *)"");
-		char buffer[32];
-		itoa(distance, buffer, 10);
+		char buf1[12];
+		char buf2[12];
+//		itoa(distance, buffer, 10);
+		ftoa(buf1, buf2, distance);
 		UART_puts((char *)"Distance: ");
 		UART_putcolor('g');
-		UART_puts(buffer);
+		UART_puts(buf1);
+		UART_puts(".");
+		UART_puts(buf2);
 		UART_putcolor('w');
 		UART_puts((char *)" cm, time of flight: ");
 		UART_putcolor('g');
-		itoa(input, buffer, 10);
-		UART_puts(buffer);
+		itoa(input, buf1, 10);
+		UART_puts(buf1);
 		UART_putcolor('w');
 		UART_puts((char *)" ms\r");
 		Delay_ms(300);

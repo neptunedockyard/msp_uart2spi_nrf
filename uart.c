@@ -132,24 +132,11 @@ void printreg(char *name, int n){
 	UART_puts((char *)")\n\r");
 }
 
-char* itoa2(int i, char b[]){
-    char const digit[] = "0123456789";
-    char* p = b;
-    if(i<0){
-        *p++ = '-';
-        i *= -1;
-    }
-    int shifter = i;
-    do{ //Move to where representation ends
-        ++p;
-        shifter = shifter/10;
-    }while(shifter);
-    *p = '\0';
-    do{ //Move back, inserting digits as u go
-        *--p = digit[i%10];
-        i = i/10;
-    }while(i);
-    return b;
+void ftoa(char *head, char *tail, float flt){
+	int intpart = (int)flt;
+	int decpart = (int)(100*(flt - intpart));
+	itoa(intpart, head, 10);
+	itoa(decpart, tail, 10);
 }
 
 
