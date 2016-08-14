@@ -12,7 +12,7 @@
 
 #define CS BIT4
 
-void Init_SPI(void);
+int Init_SPI(void);
 char SPI_txrxChar(char msg);
 void spi_CSH(void);
 void spi_CSL(void);

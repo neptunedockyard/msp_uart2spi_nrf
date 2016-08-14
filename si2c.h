@@ -20,7 +20,7 @@ unsigned char PRxData;
 static unsigned char *PTxData;
 static unsigned char TXData[] = {LCD_CLEARDISPLAY,LCD_DISPLAYON,LCD_BLINKON,LCD_BACKLIGHT};
 
-void Init_i2c();
+int Init_i2c();
 void Set_TGT(char address);
 void Transmit();
 void Transmit_char(char input);

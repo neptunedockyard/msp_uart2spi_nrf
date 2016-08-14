@@ -10,6 +10,6 @@
 
 #include <msp430g2553.h>
 
-void Init_Button();
+int Init_Button();
 
 #endif /* BUTTON_H_ */

@@ -7,7 +7,7 @@
 
 #include "si2c.h"
 
-void Init_i2c(){
+int Init_i2c(){
 //	P1OUT = BIT6 + BIT7;
 	P1SEL |= BIT6 + BIT7;						// Assign I2C pins to USCI_B0
 	P1SEL2 |= BIT6 + BIT7;						// Assign I2C pins to USCI_B0
@@ -21,6 +21,8 @@ void Init_i2c(){
 	UCB0I2CSA = tgtAddress;						// Slave Address
 	UCB0CTL1 &= ~UCSWRST;						// Clear SW reset, resume operation
 	IE2 |= UCB0TXIE + UCB0RXIE;					// Enable TX interrupt
+
+	return 1;
 }
 
 void Set_TGT(char address){

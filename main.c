@@ -8,33 +8,50 @@
 #include "button.h"
 #include "slcd.h"
 #include "nrf.h"
+#include "sonar.h"
 
 static char data;
 unsigned int i = 0;
 unsigned char c = 0x00;
+static int i2c = 0;
+static int spi = 0;
+static int btn = 0;
+static int clk = 0;
+static int led = 0;
+static int uart = 0;
+static int sonar = 0;
+static int timer = 0;
 
 // function prototypes
 void Delay_ms(unsigned int);
-void Init_Clock(int);
-void Init_Led(char);
+int Init_Clock(int);
+int Init_Led(char);
 
 int main() {
     WDTCTL = WDTPW + WDTHOLD;
-    Init_Led('r');
-//    Init_Button();
-    Init_Clock(1);
-    Init_UART();
-    Init_SPI();
-//    Init_i2c();
+    P1OUT = 0x00;
+    P2OUT = 0x00;
+    led = Init_Led('r');
+    btn = Init_Button();
+    clk = Init_Clock(1);
+    uart = Init_UART();
+//    spi = Init_SPI();
+//    i2c = Init_i2c();
+    timer = Init_timerA0();
+    sonar = Init_sonar();
 
     for(i = 0; i < 30; i++)
     	UART_sendTxt("\r\n", 2);
     UART_printLogo();
-    UART_printStatus();
-    for(;;);
+    UART_printStatus(i2c, spi, btn, clk, led, uart, sonar, timer);
+    __enable_interrupt();
+    for(;;){
+    	Delay_ms(1500);
+    	trig();
+    }
 }
 
-void Init_Led(char led){
+int Init_Led(char led){
 	//r:Red = BIT0, g:Green = BIT6, b:Both
 	int bit;
 	switch(led){
@@ -53,9 +70,11 @@ void Init_Led(char led){
 	}
 	P1DIR |= bit;
 	P1OUT = bit;
+
+	return 1;
 }
 
-void Init_Clock(int speed){
+int Init_Clock(int speed){
 	switch(speed) {
 		case 1: {
 			BCSCTL1 = CALBC1_1MHZ;
@@ -73,6 +92,8 @@ void Init_Clock(int speed){
 
 		} break;
 	}
+
+	return 1;
 }
 
 void Delay_ms(unsigned int ms){
@@ -149,7 +170,7 @@ __interrupt void USCI0RX_ISR(void)
 					printreg((char *)"conf", conf);
 				} break;
 		case '6': {
-			spi_CSL();
+			trig();
 		} break;
 		case '0': {
 			//software reset
@@ -196,6 +217,8 @@ __interrupt void USCIAB0TX_ISR(void)
 #pragma vector=PORT1_VECTOR
 __interrupt void Port_1(void)
 {
-	UART_sendTxt("Break\r\n", 7);
+	UART_puts("Trigger\r\n");
+	trig();
 	P1IFG &= ~BIT3;                           // P1.4 IFG cleared
 }
+

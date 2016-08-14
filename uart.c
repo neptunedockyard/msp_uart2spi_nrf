@@ -7,7 +7,7 @@
 
 #include "uart.h"
 
-void Init_UART(){
+int Init_UART(){
 	/* Configure hardware UART */
 	P1SEL |= BIT1 + BIT2 ;			// P1.1 = RXD, P1.2=TXD
 	P1SEL2 |= BIT1 + BIT2 ;			// P1.1 = RXD, P1.2=TXD
@@ -21,6 +21,10 @@ void Init_UART(){
 
 	//__bis_SR_register(LPM0_bits + GIE); // Enter LPM0, interrupts enabled
 	__bis_SR_register(GIE);
+
+	UART_puts((char *)"\033[0;37m");
+
+	return 1;
 }
 
 void UART_sendChar(char msg){
@@ -53,22 +57,57 @@ void UART_puts(const char *str){
 	while(*str) UART_putc(*str++);
 }
 
-void UART_printLogo(){
-    UART_sendTxt(Logo1, sizeof(Logo1));
-    UART_sendTxt("\r\n", 2);
-    UART_sendTxt(Logo2, sizeof(Logo2));
-	UART_sendTxt("\r\n", 2);
-	UART_sendTxt(Logo1, sizeof(Logo1));
-	UART_sendTxt("\r\n", 2);
+void UART_putsn(const char *str){
+	//to use:
+	//uart_puts((char *)")\n\r");
+	UART_puts((char *)"\033[0;2K");			//this clears the current line
+	while(*str) UART_putc(*str++);
 }
 
-void UART_printStatus(){
-	UART_sendTxt("Starting MSP430 Subsystem\r\n", 27);
-	UART_sendTxt("Clock init ....... OK\r\n", 23);
-	UART_sendTxt("LED init ......... OK\r\n", 23);
-	UART_sendTxt("UART init ........ OK\r\n", 23);
-	UART_sendTxt("I2C init ......... OK\r\n", 23);
-	UART_sendTxt("Btn init ......... OK\r\n", 23);
+void UART_printLogo(){
+	UART_putcolor('g');
+	UART_puts((char *)"*********************\r\n* ");
+	UART_putcolor('b');
+	UART_puts((char *)"TI MSP430 uSystem");
+	UART_putcolor('g');
+	UART_puts((char *)" *\r\n*********************\r\n");
+	UART_putcolor('w');
+}
+
+void UART_printStatus(int i2c, int spi, int button, int clock, int led, int uart, int sonar, int timer){
+	UART_puts((char *)"\033[0;37mStarting MSP430 Subsystem\r\n");
+	if(clock)
+		UART_puts((char *)"Clock init ........... \033[0;32mOK\r\n\033[0;37m");
+	else
+		UART_puts((char *)"Clock init ......... \033[0;31mFAIL\r\n\033[0;37m");
+	if(led)
+		UART_puts((char *)"LED init ............. \033[0;32mOK\r\n\033[0;37m");
+	else
+		UART_puts((char *)"LED init ........... \033[0;31mFAIL\r\n\033[0;37m");
+	if(uart)
+		UART_puts((char *)"UART init ............ \033[0;32mOK\r\n\033[0;37m");
+	else
+		UART_puts((char *)"UART init .......... \033[0;31mFAIL\r\n\033[0;37m");
+	if(spi)
+		UART_puts((char *)"SPI init ............. \033[0;32mOK\r\n\033[0;37m");
+	else
+		UART_puts((char *)"SPI init ........... \033[0;31mFAIL\r\n\033[0;37m");
+	if(i2c)
+		UART_puts((char *)"I2C init ............. \033[0;32mOK\r\n\033[0;37m");
+	else
+		UART_puts((char *)"I2C init ........... \033[0;31mFAIL\r\n\033[0;37m");
+	if(button)
+		UART_puts((char *)"Btn init ............. \033[0;32mOK\r\n\033[0;37m");
+	else
+		UART_puts((char *)"Btn init ........... \033[0;31mFAIL\r\n\033[0;37m");
+	if(sonar)
+		UART_puts((char *)"Sonar init ........... \033[0;32mOK\r\n\033[0;37m");
+	else
+		UART_puts((char *)"Sonar init ......... \033[0;31mFAIL\r\n\033[0;37m");
+	if(timer)
+		UART_puts((char *)"Timer init ........... \033[0;32mOK\r\n\033[0;37m");
+	else
+		UART_puts((char *)"Timer init ......... \033[0;31mFAIL\r\n\033[0;37m");
 }
 
 void printreg(char *name, int n){
@@ -91,4 +130,77 @@ void printreg(char *name, int n){
     UART_puts((char *)" (");
     UART_putc(n);
 	UART_puts((char *)")\n\r");
+}
+
+char* itoa2(int i, char b[]){
+    char const digit[] = "0123456789";
+    char* p = b;
+    if(i<0){
+        *p++ = '-';
+        i *= -1;
+    }
+    int shifter = i;
+    do{ //Move to where representation ends
+        ++p;
+        shifter = shifter/10;
+    }while(shifter);
+    *p = '\0';
+    do{ //Move back, inserting digits as u go
+        *--p = digit[i%10];
+        i = i/10;
+    }while(i);
+    return b;
+}
+
+
+static char *i2a(unsigned i, char *a, unsigned r)
+{
+	if (i/r > 0) a = i2a(i/r,a,r);
+	*a = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i%r];
+	return a+1;
+}
+
+char *itoa(int i, char *a, int r)
+{
+	if ((r < 2) || (r > 36)) r = 10;
+
+	if (i < 0)
+	{
+		*a = '-';
+		*i2a(-(unsigned)i,a+1,r) = 0;
+	}
+	else *i2a(i,a,r) = 0;
+	return a;
+}
+
+void UART_putcolor(char color){
+	switch(color){
+	case 'k': {									//black
+		UART_puts((char *)"\033[0;30m");
+	} break;
+	case 'r': {									//red
+		UART_puts((char *)"\033[0;31m");
+	} break;
+	case 'g': {									//green
+		UART_puts((char *)"\033[0;32m");
+	} break;
+	case 'y': {									//yellow
+		UART_puts((char *)"\033[0;33m");
+	} break;
+	case 'b': {									//blue
+		UART_puts((char *)"\033[0;34m");
+	} break;
+	case 'm': {									//magenta
+		UART_puts((char *)"\033[0;35m");
+	} break;
+	case 'c': {									//cyan
+		UART_puts((char *)"\033[0;36m");
+	} break;
+	case 'w': {									//white
+		UART_puts((char *)"\033[0;37m");
+	} break;
+	default: {
+		UART_puts((char *)"\033[0;39m");
+	} break;
+	}
 }

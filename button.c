@@ -7,7 +7,7 @@
 
 #include "button.h"
 
-void Init_Button(){
+int Init_Button(){
 	P1SEL |= ~BIT3;				// Make sure P1.1 and P1.4 are set as a Digital I/O
 	P1SEL2 |= ~BIT3;			// Make sure P1.1 and P1.4 are set as a Digital I/O
 	P1OUT |= BIT3;
@@ -18,4 +18,6 @@ void Init_Button(){
 	P1IFG &= ~BIT3;				// P1.3 IFG cleared
 
 	__bis_SR_register(GIE);
+
+	return 1;
 }

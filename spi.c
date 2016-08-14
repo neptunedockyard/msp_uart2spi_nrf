@@ -8,7 +8,7 @@
 #include "spi.h"
 #include "nrf.h"
 
-void Init_SPI(void){
+int Init_SPI(void){
 	P1SEL |= BIT5 + BIT6 + BIT7;
 	P1SEL2 |= BIT5 + BIT6 + BIT7;
 	P1DIR |= CS;
@@ -29,6 +29,8 @@ void Init_SPI(void){
 	spi_CSH();
 
 	__bis_SR_register(GIE);
+
+	return 1;
 }
 
 char SPI_txrxChar(char msg){
