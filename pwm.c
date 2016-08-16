@@ -9,7 +9,6 @@
 
 int Init_pwm(int period, int duty_cycle, int pin)
 {
-	WDTCTL = WDTPW + WDTHOLD;
 	int dc = 0;
 
 	P2DIR |= pin;

@@ -26,5 +26,6 @@ void ftoa(char *head, char *tail, float flt);
 static char *i2a(unsigned i, char *a, unsigned r);
 char *itoa(int i, char *a, int r);
 void UART_putcolor(char color);
+void UART_cowsay(const char *str);
 
 #endif /* UART_H_ */

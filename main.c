@@ -31,9 +31,10 @@ int Init_Led(char);
 
 int main() {
     WDTCTL = WDTPW + WDTHOLD;
+
     P1OUT = 0x00;
     P2OUT = 0x00;
-    P2DIR |= BIT2;
+
     led = Init_Led('r');
     btn = Init_Button();
     clk = Init_Clock(1);
@@ -47,11 +48,12 @@ int main() {
 
     for(i = 0; i < 30; i++)
     	UART_sendTxt("\r\n", 2);
+    UART_cowsay("");
     UART_printLogo();
     UART_printStatus(i2c, spi, btn, clk, led, uart, sonar, timer0, timer1, pwm);
     __enable_interrupt();
     for(;;){
-    	Delay_ms(1500);
+    	Delay_ms(10);
     	trig();
     }
 }
@@ -180,18 +182,18 @@ __interrupt void USCI0RX_ISR(void)
 		case '-': {
 			//software reset
 			UART_puts((char *)"\r\nSoft Reboot...\r\n");
-			Delay_ms(1000);
-			asm ("push &0xfffe");
 			__bic_SR_register(GIE);
-			asm ("ret");
+			Delay_ms(1000);
+			WDTCTL = 0;
+//			asm ("push &0xfffe");
+//			asm ("ret");
 		} break;
 		case '*': {
 			//software shutdown
+			UART_putsn((char *)"");
 			UART_puts((char *)"\r\nSoft Halt...\r\n");
 			Delay_ms(1000);
-			asm ("push &0xfffe");
 			__bis_SR_register(CPUOFF);
-			asm ("ret");
 		} break;
 		default: {
 			UART_sendTxt("?: ", 3);

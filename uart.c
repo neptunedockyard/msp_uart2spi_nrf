@@ -199,3 +199,14 @@ void UART_putcolor(char color){
 	} break;
 	}
 }
+
+void UART_cowsay(const char *str){
+	UART_puts((char *)"	 ___________ \r\n");
+	UART_puts((char *)"	< Mooing up > \r\n");
+	UART_puts((char *)"	 ----------- \r\n");
+	UART_puts((char *)"	        \   ^__^ \r\n");
+	UART_puts((char *)"	         \  (oo)\_______ \r\n");
+	UART_puts((char *)"	           (__)\       )\/\ \r\n");
+	UART_puts((char *)"	              ||----w | \r\n");
+	UART_puts((char *)"	              ||     || \r\n");
+}
