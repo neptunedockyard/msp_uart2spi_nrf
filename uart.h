@@ -17,7 +17,7 @@ int Init_UART();
 void UART_sendChar(char msg);
 void UART_sendTxt(char *TxArray,  char ArrayLength);
 void UART_printLogo();
-void UART_printStatus(int, int, int, int, int, int, int, int);
+void UART_printStatus(int, int, int, int, int, int, int, int, int, int);
 void UART_puts(const char *str);
 void UART_putsn(const char *str);
 void UART_putc(unsigned char c);

@@ -29,9 +29,9 @@ int Init_sonar(void){
 }
 
 int Init_timerA0(void){
-	CCTL0 = CCIE;
+	TA0CCTL0 = CCIE;
 	TA0CTL |= TASSEL_2 + MC_1;
-	CCR0 = 10000;
+	TA0CCR0 = 10000;
 	__bis_SR_register(GIE);
 
 	return 1;

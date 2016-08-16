@@ -20,7 +20,9 @@ static int clk = 0;
 static int led = 0;
 static int uart = 0;
 static int sonar = 0;
-static int timer = 0;
+static int timer0 = 0;
+static int timer1 = 0;
+static int pwm = 0;
 
 // function prototypes
 void Delay_ms(unsigned int);
@@ -31,19 +33,22 @@ int main() {
     WDTCTL = WDTPW + WDTHOLD;
     P1OUT = 0x00;
     P2OUT = 0x00;
+    P2DIR |= BIT2;
     led = Init_Led('r');
     btn = Init_Button();
     clk = Init_Clock(1);
     uart = Init_UART();
 //    spi = Init_SPI();
 //    i2c = Init_i2c();
-    timer = Init_timerA0();
-    sonar = Init_sonar();
+	timer0 = Init_timerA0();
+	sonar = Init_sonar();
+//	timer1 = Init_timerA1();
+//	pwm = Init_pwm(20000, 20, BIT2);
 
     for(i = 0; i < 30; i++)
     	UART_sendTxt("\r\n", 2);
     UART_printLogo();
-    UART_printStatus(i2c, spi, btn, clk, led, uart, sonar, timer);
+    UART_printStatus(i2c, spi, btn, clk, led, uart, sonar, timer0, timer1, pwm);
     __enable_interrupt();
     for(;;){
     	Delay_ms(1500);
@@ -172,10 +177,20 @@ __interrupt void USCI0RX_ISR(void)
 		case '6': {
 			trig();
 		} break;
-		case '0': {
+		case '-': {
 			//software reset
-			WDTCTL = WDTPW | WDTHOLD;
+			UART_puts((char *)"\r\nSoft Reboot...\r\n");
+			Delay_ms(1000);
 			asm ("push &0xfffe");
+			__bic_SR_register(GIE);
+			asm ("ret");
+		} break;
+		case '*': {
+			//software shutdown
+			UART_puts((char *)"\r\nSoft Halt...\r\n");
+			Delay_ms(1000);
+			asm ("push &0xfffe");
+			__bis_SR_register(CPUOFF);
 			asm ("ret");
 		} break;
 		default: {
@@ -217,8 +232,11 @@ __interrupt void USCIAB0TX_ISR(void)
 #pragma vector=PORT1_VECTOR
 __interrupt void Port_1(void)
 {
-	UART_puts("Trigger\r\n");
-	trig();
+//	UART_puts("Trigger\r\n");
+//	trig();
+	UART_puts((char *)"Blink\r\n");
+	pin_blink_m(BIT2, 2, 15);
+	pin_blink_m(BIT4, 2, 6);
 	P1IFG &= ~BIT3;                           // P1.4 IFG cleared
 }
 

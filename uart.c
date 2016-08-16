@@ -74,7 +74,7 @@ void UART_printLogo(){
 	UART_putcolor('w');
 }
 
-void UART_printStatus(int i2c, int spi, int button, int clock, int led, int uart, int sonar, int timer){
+void UART_printStatus(int i2c, int spi, int button, int clock, int led, int uart, int sonar, int timer0, int timer1, int pwm){
 	UART_puts((char *)"\033[0;37mStarting MSP430 Subsystem\r\n");
 	if(clock)
 		UART_puts((char *)"Clock init ........... \033[0;32mOK\r\n\033[0;37m");
@@ -104,10 +104,18 @@ void UART_printStatus(int i2c, int spi, int button, int clock, int led, int uart
 		UART_puts((char *)"Sonar init ........... \033[0;32mOK\r\n\033[0;37m");
 	else
 		UART_puts((char *)"Sonar init ......... \033[0;31mFAIL\r\n\033[0;37m");
-	if(timer)
-		UART_puts((char *)"Timer init ........... \033[0;32mOK\r\n\033[0;37m");
+	if(timer0)
+		UART_puts((char *)"Timer0 init .......... \033[0;32mOK\r\n\033[0;37m");
 	else
-		UART_puts((char *)"Timer init ......... \033[0;31mFAIL\r\n\033[0;37m");
+		UART_puts((char *)"Timer0 init ........ \033[0;31mFAIL\r\n\033[0;37m");
+	if(timer1)
+		UART_puts((char *)"Timer1 init .......... \033[0;32mOK\r\n\033[0;37m");
+	else
+		UART_puts((char *)"Timer1 init ........ \033[0;31mFAIL\r\n\033[0;37m");
+	if(pwm)
+		UART_puts((char *)"PWM init ............. \033[0;32mOK\r\n\033[0;37m");
+	else
+		UART_puts((char *)"PWM init ........... \033[0;31mFAIL\r\n\033[0;37m");
 }
 
 void printreg(char *name, int n){
